@@ -1,0 +1,2 @@
+# ComicsManager
+ Comics manager webapp

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comic Book Collection</title>
+    <style>
+        /* Add your CSS styling here */
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-input {
+            margin-bottom: 10px;
+        }
+        label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comic Book Collection</h1>
+    <button id="loadComicsButton">Load Comics</button>
+    <table id="comicsTable">
+        <tr>
+            <th>Title</th>
+            <th>Issue</th>
+            <th>Author</th>
+            <th>Artist</th>
+            <th>Publisher</th>
+            <th>Year</th>
+        </tr>
+    </table>
+    <br>
+
+    <!-- Form for adding a new comic book -->
+    <h2>Add New Comic Book</h2>
+    <div>
+        <div class="form-input">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title">
+        </div>
+        <div class="form-input">
+            <label for="issue">Issue:</label>
+            <input type="number" id="issue" name="issue">
+        </div>
+        <div class="form-input">
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author">
+        </div>
+        <div class="form-input">
+            <label for="artist">Artist:</label>
+            <input type="text" id="artist" name="artist">
+        </div>
+        <div class="form-input">
+            <label for="publisher">Publisher:</label>
+            <input type="text" id="publisher" name="publisher">
+        </div>
+        <div class="form-input">
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year">
+        </div>
+        <button id="addComicButton">Add Comic</button>
+    </div>
+
+    <script>
+       <!DOCTYPE html>
+<html>
+
+<head>
+	<title>Comic Book Collection</title>
+	<!-- Add some CSS for styling -->
+</head>
+
+<body>
+	<h1>Comic Book Collection</h1>
+
+	<!-- Table to display comics -->
+	<table id="comicsTable">
+		<tr>
+			<th>Title</th>
+			<th>Issue</th>
+			<th>Author</th>
+			<th>Artist</th>
+			<th>Publisher</th>
+			<th>Year</th>
+		</tr>
+		<!-- Comic rows will be added here by JavaScript -->
+	</table>
+	<button id="loadComics">Load Comics</button>
+	<button id="clearComics">Clear Comics</button>
+
+	<!-- Form to add a new comic -->
+	<h2>Add Comic Books</h2>
+	<input type="text" id="AddTitle" placeholder="Title">
+	<input type="text" id="AddIssue" placeholder="Issue">
+	<input type="text" id="AddAuthor" placeholder="Author">
+	<input type="text" id="AddArtist" placeholder="Artist">
+	<input type="text" id="AddPublisher" placeholder="Publisher">
+	<input type="text" id="AddYear" placeholder="Year">
+	<button id="addComic">Add Comic</button>
+
+	<!-- CSV Upload -->
+	<h2>Upload CSV</h2>
+	<input type="file" id="csvFileInput">
+	<button id="uploadCsv">Upload CSV</button>
+
+	<!-- Search Comics -->
+	<h2>Search Comics</h2>
+	<input type="text" id="SearchTitle" placeholder="Title">
+	<input type="text" id="SearchIssue" placeholder="Issue">
+	<input type="text" id="SearchAuthor" placeholder="Author">
+	<input type="text" id="SearchArtist" placeholder="Artist">
+	<input type="text" id="SearchPublisher" placeholder="Publisher">
+	<input type="text" id="SearchYear" placeholder="Year">
+	<button id="searchComics">Search</button>
+
+	<script>
+		function loadComics() {
+			fetch('/api/comics')
+				.then(response => response.json())
+				.then(comics => {
+					const table = document.getElementById('comicsTable');
+					// Ensure table is clear except for the header row
+					table.innerHTML = table.rows[0].innerHTML;
+					// Create HTML for each row of the table
+					const rows = comics.map(comic =>
+						`<tr>
+                            <td>${comic.title}</td>
+                            <td>${comic.issue}</td>
+                            <td>${comic.author}</td>
+                            <td>${comic.artist}</td>
+                            <td>${comic.publisher}</td>
+                            <td>${comic.year}</td>
+                        </tr>`
+					).join('');
+					// Append rows to the table
+					table.innerHTML += rows;
+				})
+				.catch(error => console.error('Error fetching comics:', error));
+		}
+
+		// Add event listener to the button
+		document.getElementById('loadComics').addEventListener('click', loadComics);
+
+		// Function to add a new comic book
+		function addComic() {
+			const comicData = {
+				title: document.getElementById('AddTitle').value,
+				issue: document.getElementById('AddIssue').value,
+				author: document.getElementById('AddAuthor').value,
+				artist: document.getElementById('AddArtist').value,
+				publisher: document.getElementById('AddPublisher').value,
+				year: document.getElementById('AddYear').value
+			};
+
+			fetch('/api/comics', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(comicData),
+			})
+				.then(response => response.json())
+				.then(comic => {
+					console.log('Success:', comic);
+					// Optionally clear the form
+					//document.getElementById('title').value = '';
+
+					loadComics();
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+		}
+
+		// Add event listener to the Add Comic button
+		document.getElementById('addComic').addEventListener('click', addComic);
+
+		function clearComics() {
+			const table = document.getElementById('comicsTable');
+			table.innerHTML = table.rows[0].outerHTML; // Keep the header row, remove others
+		}
+
+		document.getElementById('clearComics').addEventListener('click', clearComics);
+		function searchComics() {
+			// Gather search parameters
+			const params = {
+				title: document.getElementById('SearchTitle').value,
+				issue: document.getElementById('SearchIssue').value,
+				author: document.getElementById('SearchAuthor').value,
+				artist: document.getElementById('SearchArtist').value,
+				publisher: document.getElementById('SearchPublisher').value,
+				year: document.getElementById('SearchYear').value
+			};
+
+			// Construct query string
+			const queryString = Object.entries(params)
+				.filter(([_, value]) => value) // Only include fields with values
+				.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+				.join('&');
+
+			// Perform the search
+			fetch(`/api/comics/search?${queryString}`)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.json();
+				})
+				.then(comics => {
+					const table = document.getElementById('comicsTable');
+					// Ensure table is clear except for the header row
+					table.innerHTML = table.rows[0].outerHTML;
+					// Create HTML for each row of the table
+					const rows = comics.map(comic =>
+						`<tr>
+                    <td>${comic.title}</td>
+                    <td>${comic.issue}</td>
+                    <td>${comic.author}</td>
+                    <td>${comic.artist}</td>
+                    <td>${comic.publisher}</td>
+                    <td>${comic.year}</td>
+                </tr>`
+					).join('');
+					// Append rows to the table
+					table.innerHTML += rows;
+				})
+				.catch(error => console.error('Error during search:', error));
+		}
+
+		document.getElementById('searchComics').addEventListener('click', searchComics);
+
+        
+
+	</script>
+</body>
+
+</html>
+    </script>
+</body>
+</html>
